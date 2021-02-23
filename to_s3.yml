@@ -1,0 +1,24 @@
+- hosts: pis
+  become: true
+  become_user: root
+  vars:
+    access: "{{ lookup('file', '/etc/a') }}"
+    secret: "{{ lookup('file', '/etc/a_p') }}"
+  tasks:
+    - name: create tar files
+      archive:
+       path:
+        - /home/mark
+        - /home/pi
+        - /var/www/html
+        - /etc/ansible
+       dest: /home/backup.tar.gz
+    - name: Copy to s3
+      aws_s3:
+          aws_access_key: "{{access}}"
+          aws_secret_key: "{{secret}}"
+          bucket: "pibackup-mew"
+          src: "/home/backup.tar.gz"
+          object: "backup.tar.gz"
+          mode: put
+          overwrite: yes

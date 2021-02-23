@@ -1,0 +1,5 @@
+- hosts: pis
+  tasks:
+  - name: install using pip
+    pip:
+      name: botocore,boto3
