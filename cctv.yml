@@ -28,7 +28,7 @@
       url: https://download.visualstudio.microsoft.com/download/pr/cdd0f59e-e9ac-414c-9608-2f1aa415ce88/cf43b2bdd0218ce377027fd40cd5a162/aspnetcore-runtime-3.1.11-linux-arm.tar.gz
       dest: /tmp/aspnetcore-runtime-3.1.11-linux-arm.tar.gz
    - name: create folder for dotnet
-     win_file:
+     file:
        path: /usr/share/dotnet
        state: directory
    - name: untar file
@@ -48,7 +48,7 @@
         url: https://ispyfiles.azureedge.net/downloads/Agent_ARM32_3_1_8_0.zip
         dest: /tmp/Agent_ARM32_3_1_8_0.zip
    - name: create agent folder
-     win_file:
+     file:
        path: /usr/share/Agent_ARM32
        state: directory
    - name: unzip Agent
