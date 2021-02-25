@@ -1,0 +1,57 @@
+# https://www.ispyconnect.com/download.aspx
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+   - name: create file
+     copy:
+       content: ""
+       dest: /.bashrc
+       force: no
+       group: sys
+       owner: root
+       mode: 0555
+   - name: add env variables to profile
+     lineinfile:
+       dest: /.bashrc
+       state: present
+       insertafter: EOF
+       line: 'export PATH=$PATH:/usr/share/dotnet/dotnet' 
+   - name: add another variables to profile
+     lineinfile:
+       dest: /.bashrc
+       state: present
+       insertafter: EOF
+       line: 'export DOTNET_ROOT=/usr/share/dotnet/dotnet'
+   - name: download file
+     get_url:
+      url: https://download.visualstudio.microsoft.com/download/pr/cdd0f59e-e9ac-414c-9608-2f1aa415ce88/cf43b2bdd0218ce377027fd40cd5a162/aspnetcore-runtime-3.1.11-linux-arm.tar.gz
+      dest: /tmp/aspnetcore-runtime-3.1.11-linux-arm.tar.gz
+   - name: create folder for dotnet
+     win_file:
+       path: /usr/share/dotnet
+       state: directory
+   - name: untar file
+     unarchive:
+       src: /tmp/aspnetcore-runtime-3.1.11-linux-arm.tar.gz
+       dest: /usr/share/dotnet
+   - name: add some libaries
+     apt:
+        name: 
+          - libtbb-dev
+          - libc6-dev
+          - gss-ntlmssp
+        state: present
+        update_cache: yes
+   - name: get Agent ARM32
+     get_url:
+        url: https://ispyfiles.azureedge.net/downloads/Agent_ARM32_3_1_8_0.zip
+        dest: /tmp/Agent_ARM32_3_1_8_0.zip
+   - name: create agent folder
+     win_file:
+       path: /usr/share/Agent_ARM32
+       state: directory
+   - name: unzip Agent
+     unarchive:
+        src: /tmp/Agent_ARM32_3_1_8_0.zip
+        dest: /usr/share/Agent_ARM32
