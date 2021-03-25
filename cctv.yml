@@ -6,23 +6,23 @@
    - name: create file
      copy:
        content: ""
-       dest: /.bashrc
+       dest: /etc/profile
        force: no
        group: sys
        owner: root
        mode: 0555
    - name: add env variables to profile
      lineinfile:
-       dest: /.bashrc
+       dest: /etc/profile
        state: present
        insertafter: EOF
-       line: 'export PATH=$PATH:/usr/share/dotnet/dotnet' 
+       line: 'export PATH=$PATH:/usr/share/dotnet' 
    - name: add another variables to profile
      lineinfile:
-       dest: /.bashrc
+       dest: /etc/profile
        state: present
        insertafter: EOF
-       line: 'export DOTNET_ROOT=/usr/share/dotnet/dotnet'
+       line: 'export DOTNET_ROOT=/usr/share/dotnet'
    - name: download file
      get_url:
       url: https://download.visualstudio.microsoft.com/download/pr/cdd0f59e-e9ac-414c-9608-2f1aa415ce88/cf43b2bdd0218ce377027fd40cd5a162/aspnetcore-runtime-3.1.11-linux-arm.tar.gz
@@ -55,3 +55,7 @@
      unarchive:
         src: /tmp/Agent_ARM32_3_1_8_0.zip
         dest: /usr/share/Agent_ARM32
+   - name: run install Agent
+     shell: dotnet Agent.dll >> /var/log/ansible.log
+     args:
+       chdir: /usr/share/Agent_ARM32

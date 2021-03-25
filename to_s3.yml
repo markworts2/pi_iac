@@ -12,6 +12,7 @@
         - /home/pi
         - /var/www/html
         - /etc/ansible
+        - /var/spool/cron/crontabs
        dest: /home/backup.tar.gz
     - name: Copy to s3
       aws_s3:
