@@ -1,0 +1,17 @@
+- hosts: pis
+  become: true
+  become_user: root
+  vars:
+    access: "{{ lookup('file', '/etc/a') }}"
+    secret: "{{ lookup('file', '/etc/a_pg') }}"
+  tasks:
+    - name: Sending an e-mail using Gmail SMTP servers
+      mail:
+        host: smtp.gmail.com
+        port: 587
+        username: mark.worts@gmail.com
+        password: "{{secret}}"
+        to: Mark Worts <mark.worts@gmail.com>
+        subject: Ansible-report
+        body: System x has been successfully provisioned.
+      delegate_to: localhost
