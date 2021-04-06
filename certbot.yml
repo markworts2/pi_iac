@@ -1,0 +1,9 @@
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+   - name: Install apache certbot
+     apt:
+      name: python-certbot-apache
+      state: present
+      update_cache: yes
