@@ -1,0 +1,8 @@
+- hosts: pi1
+  become: true
+  become_user: root
+  tasks:
+  - name: Get stuff from git
+    git:
+      repo: https://github.com/amcharts/amcharts4
+      dest: /var/www/html/amcharts
