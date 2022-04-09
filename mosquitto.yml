@@ -1,0 +1,9 @@
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+   - name: Install mosquitto
+     apt:
+      name: mosquitto
+      state: present
+      update_cache: yes
