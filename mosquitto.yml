@@ -7,3 +7,21 @@
       name: mosquitto
       state: present
       update_cache: yes
+
+   - name: Install mosquitto clients
+     apt:
+      name: mosquitto-clients
+      state: present
+      update_cache: yes
+
+   - name: no password and remote config file
+     template:
+        src: "templates/mosquitto.conf.j2"
+        dest: "/etc/mosquitto/mosquitto.conf"
+     notify: restart-mos
+
+  handlers:
+    - name: restart-mos
+      service:
+        name: mosquitto
+        state: restarted

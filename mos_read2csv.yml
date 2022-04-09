@@ -1,0 +1,16 @@
+- hosts: pi4
+  become: true
+
+  tasks:
+    - name: Copy service template
+      template:
+        src: "templates/mosquitto_sub.service.j2"
+        dest: "/lib/systemd/system/mosquitto_sub.service"
+      notify: restart-mos_csv
+
+
+  handlers:
+    - name: restart-mos_csv
+      service:
+        name: mosquitto_sub
+        state: restarted

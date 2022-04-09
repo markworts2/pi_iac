@@ -1,0 +1,21 @@
+Unit] 
+
+Description=write published to csv 
+
+After=multi-user.target 
+
+ 
+
+[Service] 
+
+Type=simple 
+
+ExecStart=/home/pi/esp32/msub_to_csv.py 
+
+Restart=on-abort 
+
+ 
+
+[Install] 
+
+WantedBy=multi-user.target 
