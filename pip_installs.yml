@@ -1,5 +1,7 @@
 - hosts: pis
+  become: true
+  become_user: root
   tasks:
   - name: install using pip
     pip:
-      name: botocore,boto3
+      name: botocore,boto3,esptool

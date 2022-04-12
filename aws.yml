@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  vars_files:
+    - vars/aws.yml
+  tasks:
+    - include: tasks/aws.yml
