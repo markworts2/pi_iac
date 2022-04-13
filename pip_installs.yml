@@ -4,4 +4,7 @@
   tasks:
   - name: install using pip
     pip:
-      name: botocore,boto3,esptool
+      name: botocore,boto3,esptool,rshell
+  - name: install twitter reader twython using pip
+    pip:
+      name: twython 
