@@ -1,0 +1,9 @@
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+   - name: Install i2c tools and python library, also enable in "suso raspi-config"
+     apt:
+      name: python3-smbus,python-dev,python3-dev,i2c-tools
+      state: present
+      update_cache: yes
