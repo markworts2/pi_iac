@@ -8,3 +8,6 @@
   - name: install twitter reader twython using pip
     pip:
       name: twython 
+  - name: install mpy-cross
+    pip:
+      name: mpy-cross 
