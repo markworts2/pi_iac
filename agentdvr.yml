@@ -1,0 +1,17 @@
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+   - name: load and run
+     shell: curl -sL https://raw.githubusercontent.com/ispysoftware/agent-install-scripts/main/install.sh | bash -
+   - name: Install agent dvr
+     get_url: 
+       url: https://raw.githubusercontent.com/ispysoftware/agent-install-scripts/main/install.sh
+       dest: /tmp/install.sh
+       mode: 0755
+   - name: run install script
+     shell: /tmp/install.sh
+   - name: remove install script
+     file:
+       path: /tmp/install.sh
+       state: absent

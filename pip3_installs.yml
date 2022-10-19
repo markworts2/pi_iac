@@ -1,0 +1,7 @@
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+  - name: install using pip3
+    pip:
+      name: pi-ina219
