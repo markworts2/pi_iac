@@ -28,6 +28,11 @@
       notify:
         - update hostname
         - delete dhcp leases
+    - name: fixed wifi ssid
+      template:
+        src: "templates/wpa_supplicant.conf.j2"
+        dest: "/etc/wpa_supplicant/wpa_supplicant.conf"
+        mode: 0644
 
   handlers:
     - name: update hostname
