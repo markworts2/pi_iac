@@ -1,4 +1,4 @@
-http_host: "pi4.local"
+http_host: "html"
 http_conf: "pi4.conf"
 http_port: "80"
 app_user: "app_user"
