@@ -5,6 +5,6 @@
   - name: install using pip3
     pip:
       name: pi-ina219
-  - name: install python git
+  - name: install gitpython
     pip:
-      name: git-pull-request
+      name: GitPython
