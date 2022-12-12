@@ -18,12 +18,17 @@
         src: "templates/index.html.j2"
         dest: "/var/www/{{ http_host }}/index.html"
 
-    - name: Set up virtuahHost
+    - name: Set up virtualHost
       template:
         src: "templates/apache.conf.j2"
         dest: "/etc/apache2/sites-available/{{ http_conf }}"
-      notify: restart-apache
+      notify: restart-apacheo
 
+    - name: link as available site
+      file:
+        src: "/etc/apache2/sites-available/{{ http_conf }}"
+        dest: "/etc/apache2/sites-enabled/{{ http_conf }}"
+        state: link
 
   handlers:
     - name: restart-apache
