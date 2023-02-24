@@ -18,6 +18,8 @@
         state: directory
         owner: homeassistant
         group: homeassistant
-        
-
-
+    - name: virtual install
+      pip:
+        virtualenv: /srv/homeassistant
+        virtualenv_python: python3.4
+        name: wheel, homeassistant
