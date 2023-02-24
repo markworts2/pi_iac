@@ -10,4 +10,5 @@
     - name: create an account
       ansible.builtin.user:
         name: homeassistant
-        group: dialout, gpio, i2c
+        group: dialout
+        groups: gpio, i2c
