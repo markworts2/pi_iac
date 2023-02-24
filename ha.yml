@@ -20,7 +20,7 @@
         group: homeassistant
     - name: install virtual env
       pip:
-        name: virtualenv
+        name: virtualenv, wheel
     - name: virtual install
       pip:
         virtualenv: /srv/homeassistant
