@@ -27,6 +27,6 @@
         virtualenv_python: python3.9
         name: wheel, homeassistant
     - name: run hass
-      shell: hass
+      shell: bin/hass
       args:
         chdir: /srv/homeassistant
