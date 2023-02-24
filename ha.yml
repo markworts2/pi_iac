@@ -4,9 +4,8 @@
   tasks:
     - name: install python dependencies
        apt:
-        name: python3-dev
-        state: present
-        update_cache: yes
+        name:
+          - python3-dev
     - name: create an account
       ansible.builtin.user:
         name: homeassistant
