@@ -32,6 +32,6 @@
         chdir: /srv/homeassistant
     - name: wget home automation community
       ansible.builtin.get_url:
-        url: http://example.com/path/file.conf
+        url: https://get.hacs.xyz
         dest: /srv/homeassistant
         username: homeassistant
