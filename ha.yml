@@ -30,3 +30,8 @@
       shell: nohup bin/hass </dev/null >/dev/null 2>&1 &
       args:
         chdir: /srv/homeassistant
+    - name: wget home automation community
+      ansible.builtin.get_url:
+        url: http://example.com/path/file.conf
+        dest: /srv/homeassistant
+        username: homeassistant
