@@ -1,0 +1,21 @@
+Unit] 
+
+Description=home assistant
+
+After=multi-user.target 
+
+ 
+
+[Service] 
+
+Type=simple 
+
+ExecStart=/srv/homeassistant/bin/hass 
+
+Restart=on-abort 
+
+ 
+
+[Install] 
+
+WantedBy=multi-user.target 

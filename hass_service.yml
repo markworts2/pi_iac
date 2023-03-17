@@ -1,0 +1,16 @@
+- hosts: pi4
+  become: true
+
+  tasks:
+    - name: Copy service template
+      template:
+        src: "templates/hass.service.j2"
+        dest: "/lib/systemd/system/hass.service"
+      notify: restart-hass
+
+
+  handlers:
+    - name: restart-hass
+      service:
+        name: hass
+        state: restarted
