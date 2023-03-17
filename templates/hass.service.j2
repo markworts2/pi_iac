@@ -10,7 +10,8 @@ After=multi-user.target
 
 Type=simple 
 
-ExecStart=/srv/homeassistant/bin/hass 
+ExecStart=/srv/homeassistant/bin/hass
+User = homeassistant 
 
 Restart=on-abort 
 
