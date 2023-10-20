@@ -23,3 +23,10 @@
     format: "{{ aws_format }}"
   become_user: "{{ aws_system_user }}"
   changed_when: false
+- name: cleanup
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - /tmp/aws
+    - /tmp/awscli-bundle.zip
