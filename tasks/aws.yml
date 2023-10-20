@@ -9,7 +9,7 @@
   register: aws_cli_unarchive_installer
 
 - name: Install awscli package.
-  shell: python /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/bin
+  shell: python /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/bin/aws
   args:
     creates: /usr/local/bin/aws
   when: aws_cli_unarchive_installer.changed
@@ -23,8 +23,8 @@
     format: "{{ aws_format }}"
   become_user: "{{ aws_system_user }}"
   changed_when: false
-  
-- name: cleanup
+
+- name: Cleanup.
   file:
     path: '{{ item }}'
     state: absent
