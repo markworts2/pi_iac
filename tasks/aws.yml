@@ -1,4 +1,9 @@
 ---
+- name:
+  apt:
+    name: libc6:arm64
+    state: present
+    
 - name: Download the awscli bundle.
   get_url: url=https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip dest=/tmp/awscli-bundle.zip
   register: aws_cli_download_bundle
