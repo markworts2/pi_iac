@@ -23,6 +23,7 @@
     format: "{{ aws_format }}"
   become_user: "{{ aws_system_user }}"
   changed_when: false
+  
 - name: cleanup
   file:
     path: '{{ item }}'
