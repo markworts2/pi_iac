@@ -9,7 +9,7 @@
   register: aws_cli_unarchive_installer
 
 - name: Install awscli package.
-  shell:  /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/bin/aws
+  shell:  /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/bin
   args:
     creates: /usr/local/bin/aws
   when: aws_cli_unarchive_installer.changed
