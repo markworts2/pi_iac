@@ -1,7 +1,7 @@
 ---
 - name:
   apt:
-    name: libc6-arm64
+    name: libc6-arm64-cross
     state: present
 
 - name: Download the awscli bundle.
