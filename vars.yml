@@ -5,6 +5,10 @@ mac_address_mapping:
     name: pi4
     ip: "192.168.86.248"
 
+  "dc:a6:32:04:ff:8e":
+    name: pi4-w
+    ip: "192.168.8.1"
+
 # Nameservers to use in resolv.conf.
 dns_nameservers:
   - "8.8.8.8"
