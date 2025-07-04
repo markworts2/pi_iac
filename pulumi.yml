@@ -1,0 +1,6 @@
+- hosts: pis
+  become: true
+  become_user: root
+  tasks:
+   - name: load and run
+     shell: curl -fsSL https://get.pulumi.com | sh
