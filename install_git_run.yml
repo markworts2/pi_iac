@@ -1,0 +1,165 @@
+tHub Actions Runner Installation Playbook for Raspberry Pi
+
+# Usage: ansible-playbook -i inventory github-runner.yml
+
+- name: Install GitHub Actions Runner on Raspberry Pi
+  hosts: raspberry_pi
+  become: yes
+  vars:
+  runner_version: “2.311.0”
+  runner_user: “github-runner”
+  runner_home: “/home/{{ runner_user }}”
+  runner_dir: “{{ runner_home }}/actions-runner”
+  
+  # These should be provided via extra-vars or vault
+  
+  github_repo_url: “{{ repo_url | default(’’) }}”
+  github_token: “{{ token | default(’’) }}”
+  runner_name: “{{ name | default(ansible_hostname + ‘-runner’) }}”
+  runner_labels: “{{ labels | default(‘raspberry-pi,self-hosted,linux’) }}”
+  
+  tasks:
+  - name: Validate required variables
+    fail:
+    msg: “Missing required variables. Please provide repo_url and token”
+    when: github_repo_url == “” or github_token == “”
+  - name: Update apt cache
+    apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  - name: Install required packages
+    apt:
+    name:
+    - curl
+    - wget
+    - tar
+    - git
+    - jq
+    state: present
+  - name: Create runner user
+    user:
+    name: “{{ runner_user }}”
+    shell: /bin/bash
+    home: “{{ runner_home }}”
+    create_home: yes
+    groups: sudo
+    append: yes
+  - name: Detect system architecture
+    command: uname -m
+    register: system_arch
+    changed_when: false
+  - name: Set architecture-specific variables
+    set_fact:
+    runner_arch: >-
+    {%- if system_arch.stdout in [‘aarch64’, ‘arm64’] -%}
+    arm64
+    {%- elif system_arch.stdout in [‘armv7l’, ‘armv6l’] -%}
+    arm
+    {%- else -%}
+    {{ system_arch.stdout }}
+    {%- endif -%}
+    runner_package: >-
+    {%- if system_arch.stdout in [‘aarch64’, ‘arm64’] -%}
+    actions-runner-linux-arm64-{{ runner_version }}.tar.gz
+    {%- elif system_arch.stdout in [‘armv7l’, ‘armv6l’] -%}
+    actions-runner-linux-arm-{{ runner_version }}.tar.gz
+    {%- else -%}
+    actions-runner-linux-x64-{{ runner_version }}.tar.gz
+    {%- endif -%}
+  - name: Create runner directory
+    file:
+    path: “{{ runner_dir }}”
+    state: directory
+    owner: “{{ runner_user }}”
+    group: “{{ runner_user }}”
+    mode: ‘0755’
+  - name: Download GitHub Actions Runner
+    get_url:
+    url: “https://github.com/actions/runner/releases/download/v{{ runner_version }}/{{ runner_package }}”
+    dest: “{{ runner_dir }}/{{ runner_package }}”
+    owner: “{{ runner_user }}”
+    group: “{{ runner_user }}”
+    mode: ‘0644’
+  - name: Extract runner package
+    unarchive:
+    src: “{{ runner_dir }}/{{ runner_package }}”
+    dest: “{{ runner_dir }}”
+    owner: “{{ runner_user }}”
+    group: “{{ runner_user }}”
+    remote_src: yes
+    creates: “{{ runner_dir }}/config.sh”
+  - name: Install runner dependencies
+    command: “{{ runner_dir }}/bin/installdependencies.sh”
+    args:
+    creates: /usr/bin/dotnet
+  - name: Check if runner is already configured
+    stat:
+    path: “{{ runner_dir }}/.runner”
+    register: runner_config
+  - name: Configure GitHub Actions Runner
+    command: >
+    {{ runner_dir }}/config.sh
+    –url {{ github_repo_url }}
+    –token {{ github_token }}
+    –name {{ runner_name }}
+    –labels {{ runner_labels }},{{ runner_arch }}
+    –work _work
+    –unattended
+    –replace
+    become_user: “{{ runner_user }}”
+    args:
+    chdir: “{{ runner_dir }}”
+    when: not runner_config.stat.exists or force_reconfigure | default(false)
+  - name: Install runner as systemd service
+    command: “{{ runner_dir }}/svc.sh install {{ runner_user }}”
+    args:
+    chdir: “{{ runner_dir }}”
+    creates: “/etc/systemd/system/actions.runner.*.service”
+  - name: Start and enable runner service
+    systemd:
+    name: “actions.runner.{{ github_repo_url.split(’/’)[-2] }}-{{ github_repo_url.split(’/’)[-1] }}.{{ runner_name }}.service”
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  - name: Create runner management script
+    template:
+    src: manage-runner.sh.j2
+    dest: “{{ runner_home }}/manage-runner.sh”
+    owner: “{{ runner_user }}”
+    group: “{{ runner_user }}”
+    mode: ‘0755’
+  - name: Wait for service to be active
+    wait_for:
+    timeout: 30
+    delegate_to: localhost
+  - name: Check runner service status
+    systemd:
+    name: “actions.runner.{{ github_repo_url.split(’/’)[-2] }}-{{ github_repo_url.split(’/’)[-1] }}.{{ runner_name }}.service”
+    register: service_status
+  - name: Display installation results
+    debug:
+    msg: |
+    GitHub Actions Runner Installation Complete!
+    
+    ```
+    Runner Details:
+      - Name: {{ runner_name }}
+      - Labels: {{ runner_labels }},{{ runner_arch }}
+      - Architecture: {{ runner_arch }}
+      - Service Status: {{ service_status.status.ActiveState }}
+      - User: {{ runner_user }}
+      - Directory: {{ runner_dir }}
+    
+    Management:
+      - Use: {{ runner_home }}/manage-runner.sh {start|stop|restart|status|logs}
+      - Service: actions.runner.{{ github_repo_url.split('/')[-2] }}-{{ github_repo_url.split('/')[-1] }}.{{ runner_name }}.service
+    
+    The runner should now appear in your GitHub repository under:
+    Settings → Actions → Runners
+    ```
+  
+  handlers:
+  - name: restart runner service
+    systemd:
+    name: “actions.runner.{{ github_repo_url.split(’/’)[-2] }}-{{ github_repo_url.split(’/’)[-1] }}.{{ runner_name }}.service”
+    state: restarted

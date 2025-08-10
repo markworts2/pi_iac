@@ -1,0 +1,24 @@
+# vault.yml - Encrypted variables file
+
+# Create with: ansible-vault create vault.yml
+
+# Edit with: ansible-vault edit vault.yml
+
+# GitHub Repository Configuration
+
+github_repo_url: “https://github.com/yourusername/yourrepository”
+
+# GitHub Runner Token (get from GitHub repo settings)
+
+github_token: “ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx”
+
+# Optional: Custom runner configuration
+
+runner_name_prefix: “pi-cluster”
+runner_labels: “raspberry-pi,arm64,self-hosted,linux,docker”
+
+# Additional secrets if needed
+
+# docker_registry_password: “your_docker_password”
+
+# slack_webhook_url: “https://hooks.slack.com/services/…”

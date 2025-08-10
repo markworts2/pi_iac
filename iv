@@ -1,0 +1,32 @@
+# Ansible Inventory for Raspberry Pi GitHub Runner
+
+# Save as: inventory or hosts
+
+[raspberry_pi]
+
+# Replace with your Raspberry Pi details
+
+pi-runner-1 ansible_host=192.168.1.100 ansible_user=pi
+pi-runner-2 ansible_host=192.168.1.101 ansible_user=pi
+pi-cluster-01 ansible_host=raspberrypi.local ansible_user=pi
+
+[raspberry_pi:vars]
+
+# Common variables for all Raspberry Pi hosts
+
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args=’-o StrictHostKeyChecking=no’
+
+# GitHub Runner Configuration
+
+# These can be overridden per host or via extra-vars
+
+repo_url=https://github.com/username/repository
+
+# token should be provided via ansible-vault or extra-vars for security
+
+# token=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+name=”{{ ansible_hostname }}-runner”
+labels=“raspberry-pi,self-hosted,linux”

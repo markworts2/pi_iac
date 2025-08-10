@@ -1,0 +1,224 @@
+# GitHub Actions Runner - Ansible Installation Guide
+
+## Prerequisites
+
+1. **Ansible installed on control machine:**
+   
+   ```bash
+   # Ubuntu/Debian
+   sudo apt install ansible
+   
+   # macOS
+   brew install ansible
+   
+   # Python pip
+   pip install ansible
+   ```
+1. **SSH access to Raspberry Pi(s)**
+1. **GitHub repository with admin access**
+
+## Directory Structure
+
+```
+github-runner-ansible/
+├── github-runner.yml           # Main playbook
+├── inventory                   # Inventory file
+├── vault.yml                   # Encrypted variables (create with ansible-vault)
+├── templates/
+│   └── manage-runner.sh.j2     # Management script template
+└── README.md
+```
+
+## Setup Instructions
+
+### 1. Create Project Directory
+
+```bash
+mkdir github-runner-ansible
+cd github-runner-ansible
+```
+
+### 2. Create Files
+
+Save the provided YAML files in your project directory:
+
+- `github-runner.yml` - Main playbook
+- `inventory` - Host inventory
+- `templates/manage-runner.sh.j2` - Management script template
+
+### 3. Create Encrypted Variables
+
+```bash
+# Create encrypted vault file
+ansible-vault create vault.yml
+
+# Add your sensitive variables:
+github_repo_url: "https://github.com/yourusername/yourrepository"
+github_token: "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+### 4. Update Inventory
+
+Edit the `inventory` file with your Raspberry Pi details:
+
+```ini
+[raspberry_pi]
+my-pi ansible_host=192.168.1.100 ansible_user=pi
+```
+
+## Usage Commands
+
+### Basic Installation
+
+```bash
+# Install runner with vault password prompt
+ansible-playbook -i inventory github-runner.yml --ask-vault-pass
+
+# Install with vault password file
+ansible-playbook -i inventory github-runner.yml --vault-password-file ~/.vault_pass
+
+# Install with inline variables (less secure)
+ansible-playbook -i inventory github-runner.yml \
+  --extra-vars "repo_url=https://github.com/user/repo token=ghp_xxx"
+```
+
+### Advanced Usage
+
+```bash
+# Install on specific hosts
+ansible-playbook -i inventory github-runner.yml --limit "pi-runner-1,pi-runner-2"
+
+# Force reconfiguration of existing runner
+ansible-playbook -i inventory github-runner.yml \
+  --extra-vars "force_reconfigure=true" --ask-vault-pass
+
+# Custom runner configuration
+ansible-playbook -i inventory github-runner.yml \
+  --extra-vars "name=custom-runner labels=raspberry-pi,gpu,custom" \
+  --ask-vault-pass
+
+# Dry run (check what would be changed)
+ansible-playbook -i inventory github-runner.yml --check --ask-vault-pass
+
+# Verbose output for debugging
+ansible-playbook -i inventory github-runner.yml -vvv --ask-vault-pass
+```
+
+### Managing Multiple Runners
+
+```bash
+# Install on all Pi's in inventory
+ansible-playbook -i inventory github-runner.yml --ask-vault-pass
+
+# Install with different configurations per host
+ansible-playbook -i inventory github-runner.yml \
+  --extra-vars "@host-specific-vars.yml" --ask-vault-pass
+```
+
+## Getting GitHub Token
+
+1. Go to your GitHub repository
+1. Settings → Actions → Runners
+1. Click “New self-hosted runner”
+1. Copy the token from the configuration command
+
+## Post-Installation
+
+### Verify Installation
+
+```bash
+# Check all runners
+ansible raspberry_pi -i inventory -m shell -a "systemctl status 'actions.runner.*'"
+
+# Check runner logs
+ansible raspberry_pi -i inventory -m shell -a "journalctl -u 'actions.runner.*' --no-pager -n 20"
+```
+
+### Management Commands
+
+On each Raspberry Pi, use the generated management script:
+
+```bash
+# On the Pi
+~/manage-runner.sh status
+~/manage-runner.sh logs
+~/manage-runner.sh restart
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Architecture Detection Issues:**
+   
+   ```bash
+   # Check architecture on Pi
+   ansible raspberry_pi -i inventory -m shell -a "uname -m"
+   ```
+1. **Service Not Starting:**
+   
+   ```bash
+   # Check service status
+   ansible raspberry_pi -i inventory -m shell -a "systemctl status 'actions.runner.*'"
+   ```
+1. **Token Issues:**
+   
+   ```bash
+   # Reconfigure with new token
+   ansible-playbook -i inventory github-runner.yml \
+     --extra-vars "force_reconfigure=true token=new_token_here"
+   ```
+
+### Debug Commands
+
+```bash
+# Test connectivity
+ansible raspberry_pi -i inventory -m ping
+
+# Check runner directory
+ansible raspberry_pi -i inventory -m shell -a "ls -la ~/actions-runner/"
+
+# View runner configuration
+ansible raspberry_pi -i inventory -m shell -a "cat ~/actions-runner/.runner"
+```
+
+## Variables Reference
+
+### Playbook Variables
+
+- `runner_version`: GitHub runner version (default: “2.311.0”)
+- `runner_user`: System user for runner (default: “github-runner”)
+- `github_repo_url`: Repository URL (**required**)
+- `github_token`: Registration token (**required**)
+- `runner_name`: Runner name (default: hostname-runner)
+- `runner_labels`: Comma-separated labels
+- `force_reconfigure`: Force reconfiguration (default: false)
+
+### Inventory Variables
+
+Set in inventory file or group_vars:
+
+```yaml
+repo_url: "https://github.com/user/repo"
+token: "ghp_xxx"  # Better in vault
+name: "custom-runner-name"
+labels: "raspberry-pi,arm64,docker"
+```
+
+## Security Best Practices
+
+1. **Always use ansible-vault for tokens**
+1. **Use SSH keys instead of passwords**
+1. **Limit sudo access for runner user**
+1. **Regularly rotate GitHub tokens**
+1. **Monitor runner activity in GitHub**
+
+## Updating Runners
+
+To update all runners to a new version:
+
+```bash
+ansible-playbook -i inventory github-runner.yml \
+  --extra-vars "runner_version=2.312.0 force_reconfigure=true" \
+  --ask-vault-pass
+```
