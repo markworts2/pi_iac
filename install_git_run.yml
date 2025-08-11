@@ -1,7 +1,3 @@
-tHub Actions Runner Installation Playbook for Raspberry Pi
-
-# Usage: ansible-playbook -i inventory github-runner.yml
-
 - name: Install GitHub Actions Runner on Raspberry Pi
   hosts: pi4
   become: yes
