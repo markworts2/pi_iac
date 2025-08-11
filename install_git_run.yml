@@ -47,17 +47,17 @@
   - name: Set architecture-specific variables
     set_fact:
     runner_arch: >-
-    {%- if system_arch.stdout in [‘aarch64’, ‘arm64’] -%}
+    {%- if system_arch.stdout in ['aarch64', 'arm64'] -%}
     arm64
-    {%- elif system_arch.stdout in [‘armv7l’, ‘armv6l’] -%}
+    {%- elif system_arch.stdout in ['armv7l', 'armv6l'] -%}
     arm
     {%- else -%}
     {{ system_arch.stdout }}
     {%- endif -%}
     runner_package: >-
-    {%- if system_arch.stdout in [‘aarch64’, ‘arm64’] -%}
+    {%- if system_arch.stdout in ['aarch64, 'arm64'] -%}
     actions-runner-linux-arm64-{{ runner_version }}.tar.gz
-    {%- elif system_arch.stdout in [‘armv7l’, ‘armv6l’] -%}
+    {%- elif system_arch.stdout in ['armv7l', 'armv6l'] -%}
     actions-runner-linux-arm-{{ runner_version }}.tar.gz
     {%- else -%}
     actions-runner-linux-x64-{{ runner_version }}.tar.gz
@@ -113,7 +113,7 @@
     creates: “/etc/systemd/system/actions.runner.*.service”
   - name: Start and enable runner service
     systemd:
-    name: “actions.runner.{{ github_repo_url.split(’/’)[-2] }}-{{ github_repo_url.split(’/’)[-1] }}.{{ runner_name }}.service”
+    name: “actions.runner.{{ github_repo_url.split('/'')[-2] }}-{{ github_repo_url.split('/'')[-1] }}.{{ runner_name }}.service”
     state: started
     enabled: yes
     daemon_reload: yes
@@ -123,14 +123,14 @@
     dest: “{{ runner_home }}/manage-runner.sh”
     owner: “{{ runner_user }}”
     group: “{{ runner_user }}”
-    mode: ‘0755’
+    mode: '0755'
   - name: Wait for service to be active
     wait_for:
     timeout: 30
     delegate_to: localhost
   - name: Check runner service status
     systemd:
-    name: “actions.runner.{{ github_repo_url.split(’/’)[-2] }}-{{ github_repo_url.split(’/’)[-1] }}.{{ runner_name }}.service”
+    name: “actions.runner.{{ github_repo_url.split('/'')[-2] }}-{{ github_repo_url.split('/'')[-1] }}.{{ runner_name }}.service”
     register: service_status
   - name: Display installation results
     debug:
@@ -157,5 +157,5 @@
   handlers:
   - name: restart runner service
     systemd:
-    name: “actions.runner.{{ github_repo_url.split(’/’)[-2] }}-{{ github_repo_url.split(’/’)[-1] }}.{{ runner_name }}.service”
+    name: “actions.runner.{{ github_repo_url.split('/'')[-2] }}-{{ github_repo_url.split('/'')[-1] }}.{{ runner_name }}.service”
     state: restarted
